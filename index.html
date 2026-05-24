@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lizzie's Animal Quiz</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game" id="game">
+      <header class="topbar">
+        <div class="topbar-item">
+          <span class="topbar-label">Question</span>
+          <span class="topbar-value" id="question-counter">1 / 8</span>
+        </div>
+        <div class="topbar-item">
+          <span class="topbar-label">Score</span>
+          <span class="topbar-value" id="score">0.0</span>
+        </div>
+      </header>
+
+      <section class="card" id="question-card">
+        <div class="image-frame">
+          <img id="animal-image" alt="An animal — guess which one!" />
+          <p class="credit" id="image-credit"></p>
+        </div>
+
+        <div class="timer-wrap">
+          <div class="timer-bar" id="timer-bar"></div>
+          <span class="timer-text" id="timer-text">30.0s</span>
+        </div>
+
+        <h2 class="prompt">What animal is this?</h2>
+
+        <div class="options" id="options">
+          <!-- 4 buttons injected by script.js -->
+        </div>
+      </section>
+
+      <section class="card endscreen hidden" id="endscreen">
+        <h1 id="end-headline">All done!</h1>
+        <p id="end-message"></p>
+        <p class="final-score">
+          Final score:
+          <span id="final-score">0.0</span>
+        </p>
+        <button class="play-again" id="play-again">Play again</button>
+      </section>
+    </main>
+
+    <script src="quiz-data.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
