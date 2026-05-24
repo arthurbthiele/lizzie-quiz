@@ -90,6 +90,14 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
+  transform-origin: 50% 50%;
+  transform: scale(4);
+  will-change: transform;
+}
+
+.image-frame.revealing #animal-image {
+  transition: transform 0.4s ease-out;
+  transform: scale(1);
 }
 
 .credit {

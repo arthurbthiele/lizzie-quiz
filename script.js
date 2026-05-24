@@ -1,11 +1,13 @@
 // Game state
 const TIME_PER_QUESTION_SECONDS = 30;
 const REVEAL_DELAY_MS = 1500;
+const MAX_ZOOM = 4;
 
 const elements = {
   questionCounter: document.getElementById("question-counter"),
   score: document.getElementById("score"),
   animalImage: document.getElementById("animal-image"),
+  imageFrame: document.getElementById("animal-image").parentElement,
   imageCredit: document.getElementById("image-credit"),
   timerBar: document.getElementById("timer-bar"),
   timerText: document.getElementById("timer-text"),
@@ -55,6 +57,15 @@ function showQuestion() {
   elements.animalImage.src = q.image;
   elements.imageCredit.textContent = q.credit || "";
 
+  // Pick a fresh random zoom point in the central band (avoids landing on pure sky/grass)
+  // and start fully zoomed in. The CSS transition is removed (no .revealing class) so
+  // the per-frame JS updates drive the zoom smoothly during play.
+  elements.imageFrame.classList.remove("revealing");
+  const originX = 30 + Math.random() * 40;
+  const originY = 30 + Math.random() * 40;
+  elements.animalImage.style.transformOrigin = `${originX}% ${originY}%`;
+  elements.animalImage.style.transform = `scale(${MAX_ZOOM})`;
+
   elements.options.innerHTML = "";
   for (const option of q.shuffledOptions) {
     const btn = document.createElement("button");
@@ -67,6 +78,11 @@ function showQuestion() {
   startTimer();
 }
 
+function revealImage() {
+  // Adds a CSS transition that smoothly zooms out to full size for the reveal pause.
+  elements.imageFrame.classList.add("revealing");
+}
+
 function startTimer() {
   timerStart = performance.now();
   elements.timerBar.classList.remove("urgent");
@@ -75,11 +91,17 @@ function startTimer() {
 
 function tickTimer() {
   const elapsedMs = performance.now() - timerStart;
-  const remainingMs = Math.max(0, TIME_PER_QUESTION_SECONDS * 1000 - elapsedMs);
+  const totalMs = TIME_PER_QUESTION_SECONDS * 1000;
+  const remainingMs = Math.max(0, totalMs - elapsedMs);
   const remainingSeconds = remainingMs / 1000;
+  const progress = 1 - remainingMs / totalMs; // 0 at start, 1 at end
 
-  elements.timerBar.style.width = `${(remainingMs / (TIME_PER_QUESTION_SECONDS * 1000)) * 100}%`;
+  elements.timerBar.style.width = `${(1 - progress) * 100}%`;
   elements.timerText.textContent = `${remainingSeconds.toFixed(1)}s`;
+
+  // Zoom out in lockstep with the timer: MAX_ZOOM at start, 1 at the moment of timeout.
+  const scale = MAX_ZOOM - (MAX_ZOOM - 1) * progress;
+  elements.animalImage.style.transform = `scale(${scale})`;
 
   if (remainingSeconds <= 5) {
     elements.timerBar.classList.add("urgent");
@@ -121,6 +143,7 @@ function handleAnswer(chosenOption, buttonEl) {
     revealCorrect();
   }
 
+  revealImage();
   disableAllOptions();
   setTimeout(advance, REVEAL_DELAY_MS);
 }
@@ -130,6 +153,7 @@ function handleTimeout() {
   questionLocked = true;
   stopTimer();
   revealCorrect();
+  revealImage();
   disableAllOptions();
   setTimeout(advance, REVEAL_DELAY_MS);
 }
